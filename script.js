@@ -1,62 +1,91 @@
-const characterAmountRange = document.getElementById('characterAmountRange')
-const characterAmountNumber = document.getElementById('characterAmountNumber')
-const includeUppercaseElement = document.getElementById('includeUppercase')
-const includeNumbersElement = document.getElementById('includeNumbers')
-const includeSymbolsElement = document.getElementById('includeSymbols')
-const form = document.getElementById('passwordGeneratorForm')
-const passwordDisplay = document.getElementById('passwordDisplay')
-
-const lowToHigh = arrayFromLowToHigh(8, 128)
-
-// This is the lowercase, uppercase, and symbol characters
-var lowercase = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ];
-
-var uppercase = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-
-var numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
-
-var symbols = ['!', '@', '#', '$', '%', '^', '&', '*', '.', ',', '?', '√', '©', '∆', '˚', 'π', '®'];
+// creating arrays for each password use case
+var lowerCase = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ];
+var upperCase = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+var numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+var specialCharacters = ['!', '@', '#', '$', '%', '^', '&', '*', '.', ',', '?', '√', '©', '∆', '˚', 'π', '®'];
 
 
 
-// This syncs up the number input and slider
-characterAmountNumber.addEventListener('input', syncCharacterAmount)
-characterAmountRange.addEventListener('input', syncCharacterAmount)
+function choose() {
+    var passLength = prompt("Please choose your password length from '8' to '128'.");
+    var lower = confirm("Press 'ok' for lowercase letters");
+    var caps = confirm("Press 'ok' for uppercase letters");
+    var numbers = confirm("Press 'ok' for numbers");
+    var sChar = confirm("Press 'ok' for special characters");
 
-function syncCharacterAmount(e) {
-    const value = e.target.value
-    characterAmountNumber.value = value
-    characterAmountRange.value = value
+    // store all the answers into an object
+    var answers = {
+            small: lower,
+            upper: caps,
+            length: passLength,
+            num: numbers,
+            char: sChar
+        }
+        // return the name of that object created
+    return answers;
 }
+// create function for getting a random element from an array
+function randomElement(arr) {
+    var num = Math.floor(Math.random() * arr.length);
 
-form.addEventListener('submit', e => {
-    e.preventDefault()
-    const characterAmount = characterAmountNumber.value
-    const includeUppercase = includeUppercaseElement.checked
-    const includeNumbers = includeNumbersElement.checked
-    const includeSymbols = includeSymbolsElement.checked
-    const password = generatePassword(characterAmount, includeUppercase, includeNumbers, includeSymbols)
-    passwordDisplay.innerText = password
-})
+    var element = arr[num];
+    return element;
+}
+// check activity 3, in 03 Javascript
 
-function generatePassword(characterAmount, includeUppercase, includeNumbers, includeSymbols) {
-    let characters = lowercase
-    if (includeUppercase) characters = characters.concat(uppercase)
-    if (includeNumbers) characters = characters.concat(numbers)
-    if (includeSymbols) characters = characters.concat(symbols)
 
-    const passwordCharacters = []
-    for (let i = 0; i < characterAmount; i++) {
-        const characterCode = characters[Math.floor(Math.random() * characters.length)]
-        passwordCharacters.push(characterCode)
+
+function generatePassword() {
+    var promptChoice = choose();
+    // Create 3 empty arrays, 1 of them is the final result
+    var final = [];
+    // 1 is the possible characters that can go into the password,
+    var possibleChar = [];
+    // 1 will be the guaranteed characters going into the password
+    var guaranteed = [];
+    // create if statements to see if the user wants to each confirm
+    if (promptChoice.small === true) {
+        possibleChar = possibleChar.concat(lowerCase)
+        guaranteed.push(randomElement(lowerCase))
     }
-    return passwordCharacters.join('')
+    if (promptChoice.upper === true) {
+        possibleChar = possibleChar.concat(upperCase)
+        guaranteed.push(randomElement(upperCase))
+    }
+    if (promptChoice.num === true) {
+        possibleChar = possibleChar.concat(numbers)
+        guaranteed.push(randomElement(numbers))
+    }
+    if (promptChoice.char === true) {
+        possibleChar = possibleChar.concat(specialCharacters)
+        guaranteed.push(randomElement(specialCharacters))
+    }
+    // write for loop to loop through promptchoice.length
+    for (var i = 0; i < promptChoice.length; i++) {
+        var possElement = randomElement(possibleChar);
+        final.push(possElement);
+    }
+    for (var i = 0; i < guaranteed.length; i++) {
+        final[i] = guaranteed[i];
+    }
+    return final.join("");
 }
 
-function arrayFromLowToHigh(low, high) {
-    const array = []
-    for (var i = low; i <= high; i++) {
-        array.push(i)
-    }
-    return array
+
+
+// Assignment Code
+var generateBtn = document.querySelector("#generate");
+
+// Write password to the #password input
+function writePassword() {
+    var password = generatePassword();
+    var passwordText = document.querySelector("#password");
+
+    passwordText.value = password;
+    console.log(writePassword);
+
 }
+
+
+// Add event listener to generate button
+generateBtn.addEventListener("click", writePassword);
